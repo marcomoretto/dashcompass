@@ -24,6 +24,8 @@ N_CLICKS = OrderedDict([('overview-textarea-search-exp',0), ('overview-textarea-
                         ('overview-textarea-search-sparql', 0)])
 
 
+server = app.server
+
 app.layout = html.Div([
     dcc.Tabs(
         id="tabs-with-classes",
