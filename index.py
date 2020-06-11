@@ -232,6 +232,8 @@ def biofeatures_quick_search(n_clicks1, n_clicks2, n_clicks3, value1, value2, va
             bf=len(app.compass_module.biological_features),
             ss=len(app.compass_module.sample_sets),
         )
+    else:
+        return False, ''
 
 
 @app.callback(
