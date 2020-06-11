@@ -8,7 +8,7 @@ from app import app
 
 layout = html.Div([
     dcc.Loading(
-        id="heatmap-json-loading",
+        id="network-json-loading",
         children=[html.Div([
             dcc.Graph(
                 id="network-json",
