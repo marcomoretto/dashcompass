@@ -10,7 +10,6 @@ app = dash.Dash(__name__,
 server = app.server
 
 app.compass_connect = Connect('http://compass.fmach.it/graphql')
-#app.compass_connect = Connect('http://10.234.1.30:8080/graphql')
 app.compass_compendium = None
 app.compass_module = None
 
