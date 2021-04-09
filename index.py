@@ -440,7 +440,7 @@ def render_heatmap(heatmap):
     if app.compass_module:
         w = '100%'
         h = '100%'
-        plot, sorted_bf, sorted_ss = Plot(app.compass_module).plot_heatmap(output_format='json')
+        plot, sorted_bf, sorted_ss = Plot(app.compass_module).plot_heatmap(output_format='json', min=-5, max=5)
         return json.loads(plot), {"height" : h, "width" : w}
     return {}
 

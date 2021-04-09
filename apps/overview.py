@@ -116,7 +116,7 @@ layout = html.Div([
             id='overview-dropdown',
             options=compendia,
             placeholder="Select a compendium",
-            value=compendia[0]['value']
+            value=compendia[2]['value']
         )
     ]),
     html.Br(),
