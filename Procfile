@@ -1,1 +1,1 @@
-web: gunicorn index:server --log-file -
+web: gunicorn index:server --log-file - --timeout 12000
