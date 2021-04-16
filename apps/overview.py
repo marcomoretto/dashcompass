@@ -18,6 +18,11 @@ markdown_text = '''
   [GraphQL](https://graphql.org/) endpoint to query compendia built using [COMMAND>_](https://command.readthedocs.io>) technology.
 * [Dash](https://dash.plotly.com/introduction) *is a productive Python framework for building web applications.*
 
+#### Warning!
+This application is meant to showcase the usage of [COMPASS](https://compass.readthedocs.io) interface through a [Dash](https://dash.plotly.com/introduction) application.
+This application is not meant for serious data analysis on VESPUCCI. You should rely on [pyCOMPASS](https://pycompass.readthedocs.io/) or [rCOMPASS](https://onertipaday.github.io/rcompass/) for that.
+Have a look at the [use cases for VESPUCCI](https://vespucci.readthedocs.io/en/latest/use_cases.html)!
+
 '''
 is_open = False
 
