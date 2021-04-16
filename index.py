@@ -443,7 +443,9 @@ def render_heatmap(heatmap):
         w = '100%'
         h = '100%'
         plot, sorted_bf, sorted_ss = Plot(app.compass_module).plot_heatmap(output_format='json', min=-5, max=5)
-        return json.loads(plot), {"height" : h, "width" : w}
+        js = json.loads(plot)
+        js['layout']['plot_bgcolor'] = "rgba(100,100,100,100)" # add gray background to missing values
+        return js, {"height" : h, "width" : w}
     return {}
 
 @app.callback(
