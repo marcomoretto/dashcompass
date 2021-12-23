@@ -19,6 +19,7 @@ from pycompass import Compendium, Connect, BiologicalFeature, Module, SampleSet,
     Platform, Ontology
 
 import pandas as pd
+import numpy as np
 
 N_CLICKS = OrderedDict([('overview-textarea-search-exp',0), ('overview-textarea-biofeatures-search',0),
                         ('overview-textarea-search-sparql', 0)])
@@ -43,30 +44,40 @@ app.layout = html.Div([
                 label='Heatmap',
                 value='heatmap',
                 className='custom-tab',
-                selected_className='custom-tab--selected'
+                selected_className='custom-tab--selected',
+                id='heatmap-tab',
+                disabled=True
             ),
             dcc.Tab(
                 label='Network',
                 value='network', className='custom-tab',
-                selected_className='custom-tab--selected'
+                selected_className='custom-tab--selected',
+                id='network-tab',
+                disabled=True
             ),
             dcc.Tab(
                 label='Biological Features',
                 value='biological_features',
                 className='custom-tab',
-                selected_className='custom-tab--selected'
+                selected_className='custom-tab--selected',
+                id='biological_features-tab',
+                disabled=True
             ),
             dcc.Tab(
                 label='Sample Sets',
                 value='sample_sets',
                 className='custom-tab',
-                selected_className='custom-tab--selected'
+                selected_className='custom-tab--selected',
+                id='sample_sets-tab',
+                disabled=True
             ),
             dcc.Tab(
                 label='Tools',
                 value='tools',
                 className='custom-tab',
-                selected_className='custom-tab--selected'
+                selected_className='custom-tab--selected',
+                id='tools-tab',
+                disabled=True
             ),
             dcc.Tab(
                 label='About',
@@ -167,7 +178,9 @@ def toggle_collapse(n, is_open):
     return is_open
 
 @app.callback(
-    [Output("overview-textarea-biofeatures-search-confirm", "is_open"), Output("overview-textarea-biofeatures-search-confirm", "children")],
+    [Output("overview-textarea-biofeatures-search-confirm", "is_open"), Output("overview-textarea-biofeatures-search-confirm", "children"),
+     Output("heatmap-tab", "disabled"), Output("network-tab", "disabled"), Output("sample_sets-tab", "disabled"),
+     Output("biological_features-tab", "disabled"), Output("tools-tab", "disabled")],
     [Input('overview-textarea-biofeatures-search', 'n_clicks'), Input('overview-textarea-search-exp', 'n_clicks'),
      Input('overview-textarea-search-sparql', 'n_clicks')],
     [State('overview-textarea-biofeatures', 'value'), State('overview-textarea-experiment', 'value'),
@@ -182,14 +195,14 @@ def biofeatures_quick_search(n_clicks1, n_clicks2, n_clicks3, value1, value2, va
     N_CLICKS['overview-textarea-search-exp'] = n_clicks2
     N_CLICKS['overview-textarea-search-sparql'] = n_clicks3
     if not app.compass_compendium:
-        return False, ''
+        return False, '', True, True, True, True, True
     elif _n_clicks1 == 0 and _n_clicks2 == 0 and  _n_clicks3 == 0 and not app.compass_module:
-        return False, ''
+        return False, '', True, True, True, True, True
     elif _n_clicks1 == 0 and _n_clicks2 == 0 and  _n_clicks3 == 0 and app.compass_module:
         return True, 'Module ready! The size is {bf} biological features and {ss} sample sets. Check the other Tabs!'.format(
             bf=len(app.compass_module.biological_features),
             ss=len(app.compass_module.sample_sets),
-        )
+        ), False, False, False, False, False
     elif _n_clicks1 == 1 and _n_clicks2 == 0 and _n_clicks3 == 0:
         names = [x.strip() for x in value1.split(',')]
         bf = BiologicalFeature.using(app.compass_compendium).get(filter={'name_In': names})
@@ -205,7 +218,7 @@ def biofeatures_quick_search(n_clicks1, n_clicks2, n_clicks3, value1, value2, va
         return True, 'Module ready! The size is {bf} biological features and {ss} sample sets. Check the other Tabs!'.format(
             bf=len(app.compass_module.biological_features),
             ss=len(app.compass_module.sample_sets),
-        )
+        ), False, False, False, False, False
     elif _n_clicks1 == 0 and _n_clicks2 == 1 and _n_clicks3 == 0:
         exp_id = [x.strip() for x in value2.split(',')]
         e = Experiment.using(app.compass_compendium).get(filter={'experimentAccessId_In': exp_id})
@@ -214,7 +227,7 @@ def biofeatures_quick_search(n_clicks1, n_clicks2, n_clicks3, value1, value2, va
         return True, 'Module ready! The size is {bf} biological features and {ss} sample sets. Check the other Tabs!'.format(
             bf=len(app.compass_module.biological_features),
             ss=len(app.compass_module.sample_sets),
-        )
+        ), False, False, False, False, False
     elif _n_clicks1 == 0 and _n_clicks2 == 0 and _n_clicks3 == 1:
         sparql = []
         for x in value3.strip().split('\n'):
@@ -231,9 +244,9 @@ def biofeatures_quick_search(n_clicks1, n_clicks2, n_clicks3, value1, value2, va
         return True, 'Module ready! The size is {bf} biological features and {ss} sample sets. Check the other Tabs!'.format(
             bf=len(app.compass_module.biological_features),
             ss=len(app.compass_module.sample_sets),
-        )
+        ), False, False, False, False, False
     else:
-        return False, ''
+        return False, '', True, True, True, True, True
 
 
 @app.callback(
@@ -242,14 +255,20 @@ def biofeatures_quick_search(n_clicks1, n_clicks2, n_clicks3, value1, value2, va
     [State("heatmap-json", "children")],
 )
 def toggle_annotation(data, is_open):
-    if data:
-        bf = next((x for x in app.compass_module.biological_features if x.name == data['points'][0]['y']), None)
-        ss = next((x for x in app.compass_module.sample_sets if x.name == data['points'][0]['x']), None)
+    if data and app.compass_module:
+        bf = next((x for x in app.compass_module.biological_features if x.id == data['points'][0]['y']), None)
+        ss = next((x for x in app.compass_module.sample_sets if x.id == data['points'][0]['x']), None)
         ss_anno = []
         bf_anno = []
         for s in ss:
             for t in Annotation(s).get_triples():
-                ss_anno.append({'sample': s.sampleName, 'subject': t[0], 'predicate': t[1], 'object': t[2]})
+                geo = 'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc='
+                sra = 'https://www.ncbi.nlm.nih.gov/sra/?term='
+                if s.sampleName.startswith('GSM'):
+                    url = geo + s.sampleName.split('.')[0]
+                else:
+                    url = sra + s.sampleName.split('.')[0]
+                ss_anno.append({'sample': '[' + s.sampleName + '](' + url + ')', 'subject': t[0], 'predicate': t[1], 'object': t[2]})
         for t in Annotation(bf).get_triples():
             bf_anno.append({'subject': t[0], 'predicate': t[1], 'object': t[2]})
 
@@ -442,7 +461,12 @@ def render_heatmap(heatmap):
     if app.compass_module:
         w = '100%'
         h = '100%'
-        plot, sorted_bf, sorted_ss = Plot(app.compass_module).plot_heatmap(output_format='json', min=-5, max=5)
+        min = -5
+        max = 5
+        if app.compass_compendium.normalization == 'tpm':
+            min = np.percentile(app.compass_module.values[~np.isnan(app.compass_module.values)], 1)
+            max = np.percentile(app.compass_module.values[~np.isnan(app.compass_module.values)], 95)
+        plot, sorted_bf, sorted_ss = Plot(app.compass_module).plot_heatmap(output_format='json', min=min, max=max)
         js = json.loads(plot)
         js['layout']['plot_bgcolor'] = "rgba(100,100,100,100)" # add gray background to missing values
         return js, {"height" : h, "width" : w}
@@ -512,9 +536,17 @@ def download_module(n_clicks):
     if n_clicks:
         if app.compass_module:
             _id = str(uuid.uuid4())
-            filename = 'module-' + _id + '.cmf'
+            filename = 'module-' + _id + '.tsv'
             folder = 'static/download/'
-            app.compass_module.write_to_file(folder + filename)
+            ss_names = [ss.name for ss in app.compass_module.sample_sets]
+            s_names = [','.join([s.sampleName for s in ss]) for ss in app.compass_module.sample_sets]
+            tuples = list(zip(ss_names, s_names))
+            columns = pd.MultiIndex.from_tuples(tuples, names=["SampleSets", "Samples"])
+            module_df = pd.DataFrame(app.compass_module.values,
+                                     columns=columns,
+                                     index=[bf.name for bf in app.compass_module.biological_features])
+            module_df.to_csv(folder + filename, sep='\t')
+            #app.compass_module.write_to_file(folder + filename)
             location = folder + filename
             return [html.Li(html.A(filename, href=location))]
         else:

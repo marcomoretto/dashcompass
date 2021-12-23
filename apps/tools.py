@@ -115,7 +115,7 @@ layout = html.Div([
             dbc.CardHeader(
                 html.H2(
                     dbc.Button(
-                        f"Input/Output",
+                        f"Download module",
                         color="link",
                         id=f"group-1-io-toggle",
                     )
@@ -125,9 +125,9 @@ layout = html.Div([
                 dbc.CardBody([
                     dbc.Row([
                         dbc.Col(children=[
-                            html.H3('Download module'),
+                            html.H3('Download module TSV file'),
                             dbc.Button(
-                                "Create file",
+                                "Create TSV file",
                                 id="tool-download-module-button",
                                 className="mb-3",
                                 color="info",
@@ -140,34 +140,34 @@ layout = html.Div([
                                 type="default",
                             )
                         ]),
-                        dbc.Col(children=[
-                            html.H3('Upload module'),
-                            dcc.Upload(
-                                id="upload-module-data",
-                                children=html.Div(
-                                    ["Drag and drop or click to select a file to upload."]
-                                ),
-                                style={
-                                    "width": "100%",
-                                    "height": "60px",
-                                    "lineHeight": "60px",
-                                    "borderWidth": "1px",
-                                    "borderStyle": "dashed",
-                                    "borderRadius": "5px",
-                                    "textAlign": "center",
-                                    "margin": "10px",
-                                },
-                                multiple=True,
-                            ),
-                            html.Br(),
-                            dcc.Loading(
-                                id="upload-file-list-loading",
-                                children=[html.Div([
-                                    html.Ul(id="upload-file-list")
-                                ])],
-                                type="default",
-                            )
-                        ]),
+                        #dbc.Col(children=[
+                        #    html.H3('Upload module'),
+                        #    dcc.Upload(
+                        #        id="upload-module-data",
+                        #        children=html.Div(
+                        #            ["Drag and drop or click to select a file to upload."]
+                        #        ),
+                        #        style={
+                        #            "width": "100%",
+                        #            "height": "60px",
+                        #            "lineHeight": "60px",
+                        #            "borderWidth": "1px",
+                        #            "borderStyle": "dashed",
+                        #            "borderRadius": "5px",
+                        #            "textAlign": "center",
+                        #            "margin": "10px",
+                        #        },
+                        #        multiple=True,
+                        #    ),
+                        #    html.Br(),
+                        #    dcc.Loading(
+                        #        id="upload-file-list-loading",
+                        #        children=[html.Div([
+                        #            html.Ul(id="upload-file-list")
+                        #        ])],
+                        #        type="default",
+                        #    )
+                        #]),
                     ], className="p-5")
                 ], id="card-1-io"),
                 id=f"collapse-1-io",

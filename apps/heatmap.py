@@ -31,7 +31,7 @@ layout = html.Div([
                             page_current=0,
                             page_size=20,
                             page_action='custom',
-                            columns=[{'name': 'Subject', 'id':'subject'},
+                            columns=[{'name': 'Subject', 'id':'subject', 'presentation':'markdown'},
                                      {'name': 'Predicate', 'id':'predicate'},
                                      {'name': 'Object', 'id':'object'}],
 
@@ -50,7 +50,7 @@ layout = html.Div([
                             page_current=0,
                             page_size=20,
                             page_action='custom',
-                            columns=[{'name': 'Sample', 'id': 'sample'},
+                            columns=[{'name': 'Sample', 'id': 'sample', 'presentation':'markdown'},
                                      {'name': 'Subject', 'id': 'subject'},
                                      {'name': 'Predicate', 'id': 'predicate'},
                                      {'name': 'Object', 'id': 'object'}]
